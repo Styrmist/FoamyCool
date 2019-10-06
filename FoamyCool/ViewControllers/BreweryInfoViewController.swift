@@ -113,10 +113,6 @@ class BreweryInfoViewController: UIViewController {
             tableView.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor, constant: 10),
             tableView.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor, constant:  10),
             tableView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor, constant: 10),
-            //            beerDesctiption.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 0),
-            //            beerDesctiption.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-            //            beerDesctiption.widthAnchor.constraint(equalToConstant: scrollView.frame.width),
-            //            beerDesctiption.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             ])
     }
 }

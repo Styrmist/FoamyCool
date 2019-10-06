@@ -35,8 +35,6 @@ class BreweryCell: UITableViewCell, ReuseIdentifying {
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
     }
 
     override func prepareForReuse() {
@@ -56,5 +54,4 @@ class BreweryCell: UITableViewCell, ReuseIdentifying {
             brewLabel.trailingAnchor.constraint(lessThanOrEqualTo: nextArrow.leadingAnchor, constant: -10),
             ])
     }
-
 }

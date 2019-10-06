@@ -28,7 +28,14 @@ class LocationVC: UIViewController {
         return label
     }()
 
+    var navigationBar: UINavigationBar = {
+        let screenWidth = UIScreen.main.bounds.width
+        let navBar = UINavigationBar(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 44))
+        return navBar
+    }()
+
     var safeArea: UILayoutGuide!
+
     var data = [BreweryItem]() {
         willSet {
             placeholder.isHidden = newValue.count != 0 ? true : false
@@ -69,7 +76,6 @@ class LocationVC: UIViewController {
     }
 
     func setLayout() {
-
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: safeArea.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor),

@@ -10,21 +10,147 @@ import UIKit
 
 class FavouriteVC: UIViewController {
 
+    let tableView: UITableView = {
+        let view = UITableView(frame: UIScreen.main.bounds, style: .plain)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.rowHeight = 110
+        view.keyboardDismissMode = .onDrag
+        view.tableFooterView = UIView(frame: .zero)
+        view.separatorStyle = .none
+        return view
+    }()
+
+    let placeholder: UILabel = {
+        let label = UILabel()
+        label.text = "There is nothing here, first fav something"
+        label.textColor = .gray
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    var navigationBar: UINavigationBar = {
+        let screenWidth = UIScreen.main.bounds.width
+        let navBar = UINavigationBar(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 44))
+        return navBar
+    }()
+
+    var safeArea: UILayoutGuide!
+
+    var data = [BeerItem]() {
+        willSet {
+            placeholder.isHidden = newValue.count != 0 ? true : false
+        }
+        didSet {
+            tableView.reloadData()
+        }
+    }
+
+    var savedIds: [String] = [String]()
+
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        savedIds = UserDefaults.standard.savedBeerIds
+        for id in savedIds {
+            getBeer(by: id)
+        }
+        tableView.delegate = self
+        tableView.dataSource = self
+        self.title = "Favourite"
+        view.backgroundColor = .white
+        view.addSubview(tableView)
+        view.addSubview(placeholder)
+        safeArea = view.layoutMarginsGuide
+        tableView.register(BeerCell.self, forCellReuseIdentifier: BeerCell.reuseIdentifier)
+        setLayout()
     }
-    
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        let newIds = UserDefaults.standard.savedBeerIds
+        let (removed, inserted) = diff(savedIds, newIds, with: ==)
+        if !removed.isEmpty {
+            for id in removed {
+                savedIds.removeAll(where: { $0 == id})
+                data.removeAll(where: { $0.id == id})
+            }
+        }
+        if !inserted.isEmpty {
+            savedIds.append(contentsOf: inserted)
+            for id in inserted {
+                getBeer(by: id)
+            }
+        }
     }
-    */
 
+    func diff<T1, T2>(_ first: [T1], _ second: [T2], with compare: (T1,T2) -> Bool) -> ([T1], [T2]) {
+        let combinations = first.compactMap { firstElement in (firstElement, second.first { secondElement in compare(firstElement, secondElement) }) }
+        let common = combinations.filter { $0.1 != nil }.compactMap { ($0.0, $0.1!) }
+        let removed = combinations.filter { $0.1 == nil }.compactMap { ($0.0) }
+        let inserted = second.filter { secondElement in !common.contains { compare($0.0, secondElement) } }
+        return (removed, inserted)
+    }
+
+    func getBeer(by beerId: String) {
+        ServiceLayer.request(router: Router.getBeerBy(id: beerId)) { (result: Result<getBeerByIdResponse, Error>) in
+            switch result {
+            case .success:
+                guard let responseData = try? result.get() else { return }
+                if let beerData = responseData.data {
+                    self.data.append(beerData)
+                } else {
+                    self.data.removeAll()
+                }
+                self.tableView.reloadData()
+            case .failure:
+                print(result)
+            }
+        }
+    }
+
+    func setLayout() {
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: safeArea.topAnchor),
+            tableView.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor),
+            placeholder.centerXAnchor.constraint(equalTo: safeArea.centerXAnchor),
+            placeholder.centerYAnchor.constraint(equalTo: safeArea.centerYAnchor),
+            ])
+    }
+
+    func getData(from url: URL, completion: @escaping (Data?, URLResponse?, Error?) -> ()) {
+        URLSession.shared.dataTask(with: url, completionHandler: completion).resume()
+    }
+}
+
+extension FavouriteVC: UITableViewDataSource, UITableViewDelegate {
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return data.count
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: BeerCell.reuseIdentifier, for: indexPath) as! BeerCell
+        let current = data[indexPath.row]
+        cell.beerLabel.text = current.name
+        cell.beerStyleLabel.text = current.style?.name
+        if let icon = current.labels?.medium,
+            let iconUrl = URL(string: icon) {
+            getData(from: iconUrl) { data, response, error in
+                guard let data = data, error ==     nil else { return }
+                DispatchQueue.main.async() {
+                    cell.beerIcon.image = UIImage(data: data)
+                }
+            }
+        }
+        cell.configure()
+        return cell
+    }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let infoVC = BeerInfoViewController()
+        infoVC.beerId = data[indexPath.row].id
+        self.navigationController?.pushViewController(infoVC, animated: true)
+    }
 }

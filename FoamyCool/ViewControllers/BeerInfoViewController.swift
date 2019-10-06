@@ -48,6 +48,23 @@ class BeerInfoViewController: UIViewController {
         return textView
     }()
 
+    let favouriteButton: UIButton = {
+        let button = UIButton()
+        let size: CGFloat = 50
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(favPressed), for: .touchUpInside)
+        button.widthAnchor.constraint(equalToConstant: size).isActive = true
+        button.heightAnchor.constraint(equalToConstant: size).isActive = true
+        return button
+    }()
+
+    var isFavourite: Bool = false {
+        willSet {
+            let image = UIImage(named: newValue ? "isFavourite" : "notFavourite")
+            favouriteButton.setImage(image, for: .normal)
+        }
+    }
+
     var safeArea: UILayoutGuide!
 
     override func viewDidLoad() {
@@ -55,12 +72,13 @@ class BeerInfoViewController: UIViewController {
         getBeerData()
         categoryLabel.text = "Category"
         safeArea = view.layoutMarginsGuide
+        self.isFavourite = UserDefaults.standard.isFavourite(id: beerId)
         view.backgroundColor = .white
         view.addSubview(beerImage)
         view.addSubview(categoryLabel)
         view.addSubview(beerStyleLabel)
         view.addSubview(beerDesctiption)
-//        scrollView.addSubview(beerDesctiption)
+        view.insertSubview(favouriteButton, aboveSubview: beerDesctiption)
         setupLayout()
     }
 
@@ -90,7 +108,6 @@ class BeerInfoViewController: UIViewController {
                             }
                         }
                     } else {
-                        //TODO: create alert with ability to retry
                         print()
                     }
                 }
@@ -98,6 +115,15 @@ class BeerInfoViewController: UIViewController {
                 print(result)
             }
         }
+    }
+
+    @objc func favPressed() {
+        if isFavourite {
+            UserDefaults.standard.removeElement(id: beerId)
+        } else {
+            UserDefaults.standard.addElement(id: beerId)
+        }
+        isFavourite.toggle()
     }
 
     func setupLayout() {
@@ -116,10 +142,8 @@ class BeerInfoViewController: UIViewController {
             beerDesctiption.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor, constant: 10),
             beerDesctiption.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor, constant:  10),
             beerDesctiption.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor, constant: 10),
-//            beerDesctiption.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 0),
-//            beerDesctiption.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-//            beerDesctiption.widthAnchor.constraint(equalToConstant: scrollView.frame.width),
-//            beerDesctiption.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            favouriteButton.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor, constant: -20),
+            favouriteButton.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor, constant: -20),
         ])
     }
 }

@@ -65,7 +65,6 @@ class SearchVC: UIViewController {
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.prefetchDataSource = self
         self.title = "Search"
         view.backgroundColor = .white
         view.addSubview(searchBar)
@@ -74,36 +73,18 @@ class SearchVC: UIViewController {
         searchBar.delegate = self
         safeArea = view.layoutMarginsGuide
         tableView.register(BeerCell.self, forCellReuseIdentifier: BeerCell.reuseIdentifier)
-        tableView.dataSource = self
-        tableView.delegate = self
         setLayout()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(true)
+        searchBar.resignFirstResponder()
     }
 
     private func calcIndexPathsToReload(from newData: [BeerItem]) -> [IndexPath] {
         let startIndex = data.count - newData.count
         let endIndex = startIndex + newData.count
         return (startIndex..<endIndex).map { IndexPath(row: $0, section: 0) }
-    }
-
-    func onFetchCompleted(with newIndexPathsToReload: [IndexPath]?) {
-        // 1
-        guard let newIndexPathsToReload = newIndexPathsToReload else {
-//            indicatorView.stopAnimating()
-            tableView.isHidden = false
-            tableView.reloadData()
-            return
-        }
-        // 2
-        let indexPathsToReload = visibleIndexPathsToReload(intersecting: newIndexPathsToReload)
-        tableView.reloadRows(at: indexPathsToReload, with: .automatic)
-    }
-
-    func onFetchFailed(with reason: String) {
-//        indicatorView.stopAnimating()
-
-        let title = "Warning"
-        let action = UIAlertAction(title: "OK", style: .default)
-//        displayAlert(with: title , message: reason, actions: [action])
     }
 
     func getNewData() {
@@ -121,7 +102,6 @@ class SearchVC: UIViewController {
                         self.data = beerData
                     } else {
                         self.data.append(contentsOf: beerData)
-
                     }
                     self.currentPage += 1
                     self.requestInProgress = false
@@ -141,7 +121,6 @@ class SearchVC: UIViewController {
     }
 
     func setLayout() {
-
         NSLayoutConstraint.activate([
             searchBar.topAnchor.constraint(equalTo: safeArea.topAnchor),
             searchBar.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor),
@@ -172,16 +151,12 @@ extension SearchVC: UITableViewDataSource, UITableViewDelegate {
         cell.beerLabel.text = current.name
         cell.beerStyleLabel.text = current.style?.name
 
-        if isLoadingCell(for: indexPath) {
-//            cell.configure(with: .none)
-        } else {
-            if let icon = current.labels?.medium,
-                let iconUrl = URL(string: icon) {
-                getData(from: iconUrl) { data, response, error in
-                    guard let data = data, error ==     nil else { return }
-                    DispatchQueue.main.async() {
-                        cell.beerIcon.image = UIImage(data: data)
-                    }
+        if let icon = current.labels?.medium,
+            let iconUrl = URL(string: icon) {
+            getData(from: iconUrl) { data, response, error in
+                guard let data = data, error ==     nil else { return }
+                DispatchQueue.main.async() {
+                    cell.beerIcon.image = UIImage(data: data)
                 }
             }
         }
@@ -212,25 +187,5 @@ extension SearchVC: UISearchBarDelegate {
             currentPage = 1
             getNewData()
         }
-    }
-}
-
-extension SearchVC: UITableViewDataSourcePrefetching {
-    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
-        if indexPaths.contains(where: isLoadingCell) {
-            getNewData()
-        }
-    }
-}
-
-private extension SearchVC {
-    func isLoadingCell(for indexPath: IndexPath) -> Bool {
-        return indexPath.row >= data.count
-    }
-
-    func visibleIndexPathsToReload(intersecting indexPaths: [IndexPath]) -> [IndexPath] {
-        let indexPathsForVisibleRows = tableView.indexPathsForVisibleRows ?? []
-        let indexPathsIntersection = Set(indexPathsForVisibleRows).intersection(indexPaths)
-        return Array(indexPathsIntersection)
     }
 }
