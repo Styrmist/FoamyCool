@@ -27,7 +27,7 @@ extension UserDefaults {
         let defaults = UserDefaults.standard
         var beerIds = defaults.object(forKey: "savedBeerIds") as? [String] ?? [String]()
         beerIds.removeAll(where: { $0 == id })
-        defaults.set(beerIds, forKey: "savedBeerI	ds")
+        defaults.set(beerIds, forKey: "savedBeerIds")
     }
 
     func addElement(id: String) {
