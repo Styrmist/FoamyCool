@@ -162,7 +162,7 @@ class SearchVC: UIViewController {
 
 extension SearchVC: UITableViewDataSource, UITableViewDelegate {
 
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return data.count
     }
 

@@ -18,12 +18,13 @@ struct BeerItem: Codable {
 
 struct BeerStyle: Codable {
     let id: Int
-    let name: String
+    let name: String?
     let shortName: String?
 }
 
 struct BeerIcons: Codable {
-    let icon: String
-    let medium: String
-    let large: String
+    let icon: String?
+    let medium: String?
+    let large: String?
+    let squareMedium: String?
 }

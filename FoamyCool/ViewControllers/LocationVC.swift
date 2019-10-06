@@ -114,7 +114,12 @@ extension LocationVC: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let infoVC = BreweryInfoViewController()
-        self.present(infoVC, animated: true, completion: {})
+        let current = data[indexPath.row]
+        infoVC.brewId = current.breweryId
+        infoVC.brewName = current.name
+        infoVC.brewIcon = current.brewery?.images?.squareMedium
+        infoVC.brewDescription = current.brewery?.description
+        self.navigationController?.pushViewController(infoVC, animated: true)
     }
 }
 
