@@ -9,7 +9,7 @@
 import Foundation
 
 enum Router {
-    case searchForBeer(_: String)
+    case searchForBeer(_: String, page: Int)
     case getBeerBy(id: String)
     case getBeersForBreweryBy(id: String)
     case getBreweriesByLocation(lat: String, lng: String)
@@ -46,8 +46,8 @@ enum Router {
     var parameters: [URLQueryItem] {
         let accessKey = "20bb8d55cb693c11b4ce1d581f390f32"
         switch self {
-        case .searchForBeer(let query):
-            return [URLQueryItem(name: "p", value: "1"),
+        case .searchForBeer(let query, let page):
+            return [URLQueryItem(name: "p", value: String(page)),
                     URLQueryItem(name: "q", value: query),
                     URLQueryItem(name: "type", value: "beer"),
                     URLQueryItem(name: "key", value: accessKey)]
