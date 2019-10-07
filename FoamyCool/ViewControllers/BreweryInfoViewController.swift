@@ -75,7 +75,7 @@ class BreweryInfoViewController: UIViewController {
     }
 
     func getBeerData() {
-        ServiceLayer.request(router: Router.getBeersForBreweryBy(id: brewId)) { (result: Result<searchBeerResponse, Error>) in
+        ServiceLayer.request(router: Router.getBeersForBreweryBy(id: brewId)) { (result: Result<SearchBeerResponse, Error>) in
             switch result {
             case .success:
                 guard let responseData = try? result.get() else { return }

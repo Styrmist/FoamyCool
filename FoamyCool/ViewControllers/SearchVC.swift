@@ -93,7 +93,7 @@ class SearchVC: UIViewController {
         }
         requestInProgress = true
 
-        ServiceLayer.request(router: Router.searchForBeer(textForSearch, page: currentPage)) { (result: Result<searchBeerResponse, Error>) in
+        ServiceLayer.request(router: Router.searchForBeer(textForSearch, page: currentPage)) { (result: Result<SearchBeerResponse, Error>) in
             switch result {
             case .success:
                 guard let responseData = try? result.get() else { return }

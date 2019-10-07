@@ -91,7 +91,7 @@ class FavouriteVC: UIViewController {
     }
 
     func getBeer(by beerId: String) {
-        ServiceLayer.request(router: Router.getBeerBy(id: beerId)) { (result: Result<getBeerByIdResponse, Error>) in
+        ServiceLayer.request(router: Router.getBeerBy(id: beerId)) { (result: Result<GetBeerByIdResponse, Error>) in
             switch result {
             case .success:
                 guard let responseData = try? result.get() else { return }

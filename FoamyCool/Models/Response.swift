@@ -8,21 +8,21 @@
 
 import Foundation
 
-struct searchBeerResponse: Codable {
+struct SearchBeerResponse: Codable {
     let currentPage: Int?
     let numberOfPages: Int?
     let data: [BeerItem]?
     let status: String
 }
 
-struct searchBreweryResponse: Codable {
+struct SearchBreweryResponse: Codable {
     let currentPage: Int?
     let numberOfPages: Int?
     let data: [BreweryItem]?
     let status: String
 }
 
-struct getBeerByIdResponse: Codable {
+struct GetBeerByIdResponse: Codable {
     let message: String?
     let data: BeerItem?
     let status: String

@@ -87,7 +87,7 @@ class LocationVC: UIViewController {
     }
 
     func locationChanged() {
-        ServiceLayer.request(router: Router.getBreweriesByLocation(lat: String(coords.lat), lng: String(coords.lon))) { (result: Result<searchBreweryResponse, Error>) in
+        ServiceLayer.request(router: Router.getBreweriesByLocation(lat: String(coords.lat), lng: String(coords.lon))) { (result: Result<SearchBreweryResponse, Error>) in
             switch result {
             case .success:
                 guard let responseData = try? result.get() else { return }

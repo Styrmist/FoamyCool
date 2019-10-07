@@ -87,7 +87,7 @@ class BeerInfoViewController: UIViewController {
     }
 
     func getBeerData() {
-        ServiceLayer.request(router: Router.getBeerBy(id: beerId)) { (result: Result<getBeerByIdResponse, Error>) in
+        ServiceLayer.request(router: Router.getBeerBy(id: beerId)) { (result: Result<GetBeerByIdResponse, Error>) in
             switch result {
             case .success:
                 DispatchQueue.main.async {
