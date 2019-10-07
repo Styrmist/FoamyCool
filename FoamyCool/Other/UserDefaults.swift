@@ -17,7 +17,7 @@ extension UserDefaults {
     func isFavourite(id: String) -> Bool {
         let defaults = UserDefaults.standard
         let beerIds = defaults.object(forKey: "savedBeerIds") as? [String] ?? [String]()
-        if let _ = beerIds.firstIndex(of: id) {
+        if beerIds.firstIndex(of: id) != nil {
             return true
         }
         return false

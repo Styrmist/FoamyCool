@@ -11,7 +11,7 @@ import UIKit
 class BeerCell: UITableViewCell, ReuseIdentifying {
     let imageSize: CGFloat = 100
 
-    let beerIcon:  UIImageView = {
+    let beerIcon: UIImageView = {
         let view = UIImageView()
         view.image = UIImage(named: "defaultBeerLabel")
         view.translatesAutoresizingMaskIntoConstraints = false

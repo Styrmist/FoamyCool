@@ -9,7 +9,7 @@
 import Foundation
 
 class ServiceLayer {
-    class func request<T: Codable>(router: Router, completion: @escaping (Result<T, Error>) -> ()) {
+    class func request<T: Codable>(router: Router, completion: @escaping (Result<T, Error>) -> Void) {
         var components = URLComponents()
         components.scheme = router.scheme
         components.host = router.host
