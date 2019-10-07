@@ -19,8 +19,7 @@ class MainTabBarController: UITabBarController {
         searchVC.tabBarItem = UITabBarItem(title: "Search", image: UIImage(named: "search"), tag: 0)
         locationVC.tabBarItem = UITabBarItem(title: "Location", image: UIImage(named: "location"), tag: 1)
         favouriteVC.tabBarItem = UITabBarItem(title: "Favourite", image: UIImage(named: "favourite"), tag: 2)
-        
         let tabBarList = [searchVC, locationVC, favouriteVC]
-        viewControllers = tabBarList
+        viewControllers = tabBarList.map { UINavigationController(rootViewController: $0)}
     }
 }
