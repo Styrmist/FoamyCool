@@ -67,27 +67,16 @@ class FavouriteVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         let newIds = UserDefaults.standard.savedBeerIds
-        let (removed, inserted) = diff(savedIds, newIds, with: ==)
-        if !removed.isEmpty {
-            for id in removed {
-                savedIds.removeAll(where: { $0 == id})
-                data.removeAll(where: { $0.id == id})
+        let difference = Set(savedIds).symmetricDifference(newIds)
+        for item in difference {
+            if savedIds.contains(item) {
+                savedIds.removeAll(where: { $0 == item})
+                data.removeAll(where: { $0.id == item})
+            } else {
+                savedIds.append(item)
+                getBeer(by: item)
             }
         }
-        if !inserted.isEmpty {
-            savedIds.append(contentsOf: inserted)
-            for id in inserted {
-                getBeer(by: id)
-            }
-        }
-    }
-
-    func diff<T1, T2>(_ first: [T1], _ second: [T2], with compare: (T1,T2) -> Bool) -> ([T1], [T2]) {
-        let combinations = first.compactMap { firstElement in (firstElement, second.first { secondElement in compare(firstElement, secondElement) }) }
-        let common = combinations.filter { $0.1 != nil }.compactMap { ($0.0, $0.1!) }
-        let removed = combinations.filter { $0.1 == nil }.compactMap { ($0.0) }
-        let inserted = second.filter { secondElement in !common.contains { compare($0.0, secondElement) } }
-        return (removed, inserted)
     }
 
     func getBeer(by beerId: String) {
